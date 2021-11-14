@@ -63,7 +63,7 @@ const TabBar = ({
         });
 
         return (
-          <View>
+          <View key={index}>
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityState={isFocused ? {selected: true} : {}}

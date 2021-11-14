@@ -15,13 +15,14 @@ const Header: React.FC<HeaderProps> = props => {
   const {onBack, onRightButton, title} = props;
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  console.log('theme', theme);
+  const topInset = insets.top === 0 ? Sizing.sm : insets.top;
+
   return (
     <View
       style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingTop: insets.top,
+        paddingTop: topInset,
         marginHorizontal: Sizing.sm,
       }}>
       {onBack && (

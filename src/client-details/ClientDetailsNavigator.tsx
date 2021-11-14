@@ -12,7 +12,7 @@ type ClientDetailsStack = {
 const Tab = createMaterialTopTabNavigator<ClientDetailsStack>();
 
 const SessionsScreen = () => {
-  return <View />;
+  return <View style={{flex: 1, backgroundColor: 'white'}} />;
 };
 
 const ClientDetailsNavigator: React.FC = () => {

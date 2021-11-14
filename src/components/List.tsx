@@ -22,6 +22,7 @@ function List<T>(props: ListProps<T>) {
       )}
       <FlatList
         data={data}
+        showsVerticalScrollIndicator={false}
         ListHeaderComponent={ListHeaderComponent}
         style={[{flexGrow: 1}, style]}
         renderItem={({item}) => render(item)}

@@ -84,8 +84,8 @@ const secondaryEmphasis: TextStyle = {
 const greyTag: TextStyle = {
   fontStyle: 'normal',
   fontWeight: '500',
-  fontSize: 10,
-  lineHeight: 12,
+  fontSize: 13,
+  lineHeight: 16,
   color: Colors.grey,
 };
 

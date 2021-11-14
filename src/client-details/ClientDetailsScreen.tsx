@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {Text, View} from 'react-native';
 import {AppStackRoutes} from '../../App';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -7,13 +7,39 @@ import {ScreenView} from '../components/ScreenView';
 import {Sizing} from '../theme/sizing';
 import {Theme, useTheme} from '../theme/theme';
 import {ClientDetailsNavigator} from './ClientDetailsNavigator';
+import {useAppDispatch} from '../hooks/useAppDispatch';
+import {useAppSelector} from '../hooks/useAppSelector';
+import {getClientPayments} from '../clients-service/clientService';
+import {removeClientDetails} from '../store/reducers/clientReducer';
 
-type ClientDetailsScreenNavigation = StackScreenProps<AppStackRoutes, 'Home'>;
+type ClientDetailsScreenNavigation = StackScreenProps<
+  AppStackRoutes,
+  'ClientDetails'
+>;
 
 const ClientDetailsScreen: React.FC<ClientDetailsScreenNavigation> = ({
   navigation,
+  route,
 }) => {
   const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const {name, phone, email, revenues, userId} = route.params;
+  const numberFormatted = useMemo(() => {
+    let USNumber = phone.match(/(\d{3})(\d{3})(\d{4})/);
+    if (USNumber) return `+1 ${USNumber[1]} ${USNumber[2]} ${USNumber[3]}`;
+  }, [phone]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      dispatch(getClientPayments(userId));
+    });
+  }, [userId]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(removeClientDetails());
+    };
+  }, []);
 
   return (
     <ScreenView
@@ -21,18 +47,20 @@ const ClientDetailsScreen: React.FC<ClientDetailsScreenNavigation> = ({
         onBack: navigation.goBack,
         title: (
           <HeaderTitle
-            title={'Alex Greenwood'}
-            subTitle={'+1 548 545 8947'}
-            thirdTitle={'alex@greenwood.com'}
+            title={name}
+            subTitle={numberFormatted}
+            thirdTitle={email}
             theme={theme}
           />
         ),
 
-        onRightButton: () => '',
+        onRightButton: () => console.log('onRightButton'),
       }}
-      extra={{onExtraPressed: () => ''}}>
+      extra={{onExtraPressed: () => console.log('onExtraPressed')}}>
       <View style={{alignItems: 'center'}}>
-        <Text style={theme.typography.secondaryBanner}>$1400.00</Text>
+        <Text style={theme.typography.secondaryBanner}>{`$${String(
+          revenues,
+        ).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, '$1,')}`}</Text>
         <Text style={[theme.typography.secondaryLabel, {marginTop: Sizing.xs}]}>
           Total Earned
         </Text>

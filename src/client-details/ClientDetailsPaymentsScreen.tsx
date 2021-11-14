@@ -1,86 +1,55 @@
-import React from 'react';
-import {SectionList, Text, View} from 'react-native';
+import moment from 'moment';
+import React, {useMemo} from 'react';
+import {Text, View} from 'react-native';
 import {Divider} from '../components/Divider';
+import {SectionList} from '../components/SectionList';
+import {useAppSelector} from '../hooks/useAppSelector';
+import {PaymentsData} from '../store/reducers/clientReducer';
 import {Sizing} from '../theme/sizing';
 import {Theme, useTheme} from '../theme/theme';
 
-enum StatusEnum {
-  Open = 'Open',
-  Paid = 'Paid',
+enum PaymentStatusEnum {
+  Open = 'open',
+  Paid = 'paid',
 }
 
 interface PaymentData {
   id?: number;
   userId?: string;
-  status?: StatusEnum;
+  status?: PaymentStatusEnum;
   created?: number;
   amount?: number;
   description?: string;
 }
 
 interface SectionData {
-  title: StatusEnum;
+  title: PaymentStatusEnum;
   data: PaymentData[];
 }
 
-const data: SectionData[] = [
-  {
-    title: StatusEnum.Open,
-    data: [
-      {
-        id: 4,
-        userId: '609d85e52f2d7df3f48e4422',
-        status: StatusEnum.Open,
-        created: 1636675656904,
-        amount: 200,
-        description: '1 on 1',
-      },
-      {
-        id: 1,
-        userId: '609d85e52f2d7df3f48e4422',
-        status: StatusEnum.Open,
-        created: 1636675656904,
-        amount: 200,
-        description: '1 on 1',
-      },
-    ],
-  },
-  {
-    title: StatusEnum.Paid,
-    data: [
-      {
-        id: 4,
-        userId: '609d85e52f2d7df3f48e4422',
-        status: StatusEnum.Open,
-        created: 1636675656904,
-        amount: 200,
-        description: '1 on 1',
-      },
-      {
-        id: 1,
-        userId: '609d85e52f2d7df3f48e4422',
-        status: StatusEnum.Open,
-        created: 1636675656904,
-        amount: 200,
-        description: '1 on 1',
-      },
-    ],
-  },
-];
-
 const ClientDetailsPaymentsScreen: React.FC = () => {
   const theme = useTheme();
+  const payments = useAppSelector(state => state.client.clientPayments);
+  const data = useMemo(() => {
+    let openData = payments.data?.filter(
+      item => item.status === PaymentStatusEnum.Open,
+    );
+    let paidData = payments.data?.filter(
+      item => item.status === PaymentStatusEnum.Paid,
+    );
+    return [
+      {title: 'OPEN', data: openData ?? []},
+      {title: 'PAID', data: paidData ?? []},
+    ];
+  }, [payments]);
+
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
-      <SectionList
-        style={{marginTop: Sizing.md}}
-        SectionSeparatorComponent={() => {
-          return <View style={{marginTop: Sizing.sm}} />;
-        }}
-        sections={data}
-        contentContainerStyle={{marginHorizontal: Sizing.md}}
-        keyExtractor={(item, index) => String((item.id ?? 0) + index)}
-        renderItem={({item}) => {
+      <SectionList<PaymentsData>
+        data={data}
+        titleColor="grey"
+        keyExtractor={props => props.id.toString()}
+        renderItem={item => {
           return (
             <View>
               <Divider style={{marginTop: Sizing.sm}} />
@@ -88,9 +57,6 @@ const ClientDetailsPaymentsScreen: React.FC = () => {
             </View>
           );
         }}
-        renderSectionHeader={({section: {title}}) => (
-          <Text style={theme.typography.darkGreyLabel}>{title}</Text>
-        )}
       />
     </View>
   );
@@ -126,7 +92,7 @@ const PaymentCard = (props: PaymentCardProps) => {
         <Text
           style={theme.typography.secondaryHeaderTitle}>{`$${amount}`}</Text>
         <Text style={[theme.typography.greyTag, {marginTop: Sizing.xs}]}>
-          {created}
+          {moment(created).format('MMM DD/YYYY')}
         </Text>
       </View>
     </View>

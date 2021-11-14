@@ -9,7 +9,7 @@ import {
 } from '../store/reducers/clientReducer';
 
 // Change IP for android device
-const domain = Platform.OS === 'android' ? '192.168.7.203' : 'localhost';
+const domain = Platform.OS === 'android' ? 'localhost' : 'localhost';
 
 export const getClients = createAsyncThunk(
   'clients/getClients',
